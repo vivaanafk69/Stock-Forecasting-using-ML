@@ -24,12 +24,12 @@ warnings.filterwarnings('ignore')
 
 # Configure page
 st.set_page_config(
-    page_title="Chartiqo", 
+    page_title="FinSight", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Custom CSS for better styling and interactivity
 st.markdown("""
 <style>
     .main-header {
@@ -39,7 +39,23 @@ st.markdown("""
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+    .FinSight-credits {
+        text-align: center;
+        font-size: 0.95rem;
+        color: #764ba2;
         margin-bottom: 2rem;
+        margin-top: -0.5rem;
+        letter-spacing: 0.01em;
+    }
+    .metric-container, .prediction-card {
+        box-shadow: 0 6px 24px 0 rgba(102,126,234,0.18);
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .metric-container:hover, .prediction-card:hover {
+        transform: scale(1.025);
+        box-shadow: 0 12px 32px 0 rgba(102,126,234,0.25);
     }
     .metric-container {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -50,17 +66,38 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     .prediction-card {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 1.5rem;
         border-radius: 15px;
         color: white;
         text-align: center;
         margin: 1rem 0;
     }
+    .stButton>button {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 2px 8px 0 rgba(102,126,234,0.15);
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .stButton>button:hover {
+        background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+        box-shadow: 0 4px 16px 0 rgba(102,126,234,0.25);
+    }
+    .section-divider {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        margin: 2.5rem 0 1.5rem 0;
+        opacity: 0.18;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="main-header">Chartiqo</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="main-header">☘️FinSight</h1>', unsafe_allow_html=True)
+st.markdown('<div class="FinSight-credits">Developed by Vivaan Gandhi<br>& Puranjay Haldankar</div>', unsafe_allow_html=True)
 
 # Sidebar Configuration
 with st.sidebar:
@@ -68,9 +105,7 @@ with st.sidebar:
     
     # Stock Selection
     ticker = st.text_input("Stock Ticker", value="AAPL", help="Enter stock symbol (e.g., AAPL, GOOGL, TSLA)").upper()
-    
-    #news
-    st.sidebar.page_link("pages/1_Live_News.py", label="📰 Live News")
+
 
     # Time Parameters
     period = st.selectbox("Time Period(for training data)", ["1mo", "3mo", "6mo", "1y", "2y", "5y"], index=2)
@@ -482,6 +517,8 @@ if ticker:
         else:
             st.metric("Market Cap", "📊")
     
+    st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
+
     # Interactive Chart
     #Filter df for chart display range 
     if display_range != "6 Months":
@@ -828,25 +865,9 @@ if ticker:
     # Export Options
     st.subheader("💾 Export & Share")
     
-    col1, col2, col3 = st.columns(3)
-    
+    col1, _ = st.columns([1,2])
     with col1:
         if st.button("📊 Export Data"):
             csv = df.to_csv(index=False)
             st.download_button("Download CSV", csv, f"{ticker}_data.csv", "text/csv")
-    
-    with col2:
-        if st.button("📈 Export Chart"):
-            st.info("Chart export functionality - integrate with Plotly export")
-    
-    with col3:
-        if st.button("📧 Share Analysis"):
-            st.info("Share functionality - integrate with email/social APIs")
 
-
-    st.markdown("""
-    ## Welcome to the Enterprise Stock Analytics Platform! 🚀
-    ##
-    Developed By Vivaan Gandhi
-    Co-Developed By puranjay Haldankar
-    """)
