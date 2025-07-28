@@ -38,4 +38,4 @@ A full-featured, production-ready **stock price prediction platform** with:
 git clone https://github.com/vivaanafk69/Stock-Forecasting-using-ML.git
 cd Stock-Forecasting-using-ML
 pip install -r requirements.txt
-streamlit run Dashboard.py
+streamlit run Home.py
