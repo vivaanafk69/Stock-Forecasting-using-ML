@@ -122,7 +122,7 @@ with st.sidebar:
     )
     
     # Model Configuration
-    st.subheader("ML Configuration")
+    st.subheader("🤖 ML Configuration")
     model_type = st.selectbox("Prediction Model", [
         "Ensemble (Recommended)",
         "Random Forest", 
@@ -134,7 +134,7 @@ with st.sidebar:
     ])
     
     # Advanced Settings
-    with st.expander("Advanced Settings"):
+    with st.expander("⚙️ Advanced Settings"):
         prediction_days = st.slider("Prediction Horizon (days)", 1, 30, 5)
         confidence_interval = st.slider("Confidence Interval %", 80, 99, 95)
         model_seed = st.number_input("Random Seed (for reproducibility)", value=42, min_value=0)
@@ -480,7 +480,7 @@ def create_interactive_chart(df, show_indicators):
 # Main Application Logic
 if ticker:
     # Fetch data
-    with st.spinner("Fetching market data..."):
+    with st.spinner("📡 Fetching market data..."):
         df, status = fetch_stock_data(ticker, period, interval)
     
     if df.empty:
@@ -488,7 +488,7 @@ if ticker:
         st.stop()
     
     # Calculate indicators
-    with st.spinner("Calculating technical indicators..."):
+    with st.spinner("🔧 Calculating technical indicators..."):
         df = calculate_technical_indicators(df)
     
     # Display key metrics
@@ -541,14 +541,14 @@ if ticker:
         df_display = df.loc[mask]
     else:
         df_display = df
-    st.subheader("Interactive Chart Analysis")
+    st.subheader("📊 Interactive Chart Analysis")
     chart = create_interactive_chart(df_display, show_indicators)
     st.plotly_chart(chart, use_container_width=True)
     
     # Advanced Predictions
-    st.subheader("Predictions")
+    st.subheader("🤖 AI-Powered Predictions")
     
-    with st.spinner("Training AI models..."):
+    with st.spinner("🧠 Training AI models..."):
         X, y = create_advanced_features(df)
         
         if X is not None and len(X) > 50:
@@ -708,7 +708,7 @@ if ticker:
                     """, unsafe_allow_html=True)
                 
                 # Display predictions table
-                st.subheader(f"{prediction_days}-Day Price Predictions")
+                st.subheader(f"📅 {prediction_days}-Day Price Predictions")
                 
                 # Format the predictions table for better display
                 display_df = predictions_df.copy()
@@ -784,7 +784,7 @@ if ticker:
                     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
                     r2 = r2_score(y_test, y_pred)
                     
-                    st.subheader("Model Performance")
+                    st.subheader("📈 Model Performance")
                     col1, col2, col3 = st.columns(3)
                     col1.metric("Mean Absolute Error", f"${mae:.2f}")
                     col2.metric("Root Mean Square Error", f"${rmse:.2f}")
@@ -796,7 +796,7 @@ if ticker:
             st.warning("Insufficient data for reliable predictions. Try a longer time period.")
     
     # Trading Signals
-    st.subheader("AI Trading Signals")
+    st.subheader("🎯 AI Trading Signals")
     signals = generate_trading_signals(df)
     
     if signals:
@@ -813,7 +813,7 @@ if ticker:
         st.info("🟡 No strong signals detected. Market appears neutral.")
     
     # Risk Analysis
-    st.subheader("Risk Analysis")
+    st.subheader("⚠️ Risk Analysis")
     
     if 'Volatility_20' in df.columns:
         volatility = df['Volatility_20'].iloc[-1] * 100
@@ -838,7 +838,7 @@ if ticker:
             st.metric("Value at Risk (95%)", f"{var_95:.2f}%")
     
     # Advanced Analytics
-    with st.expander("Advanced Analytics Dashboard"):
+    with st.expander("📊 Advanced Analytics Dashboard"):
         
         tab1, tab2, tab3 = st.tabs(["📈 Price Analysis", "📊 Volume Analysis", "🔄 Correlation Matrix"])
         
@@ -863,7 +863,7 @@ if ticker:
                 st.plotly_chart(fig_corr, use_container_width=True)
     
     # Export Options
-    st.subheader("Export & Share")
+    st.subheader("💾 Export & Share")
     
     col1, _ = st.columns([1,2])
     with col1:
