@@ -2,8 +2,9 @@ services:
   - type: web
     name: stock-forecast-app
     runtime: python
-    buildCommand: ""
-    startCommand: streamlit run Home.py --server.port=$PORT --server.address=0.0.0.0
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run Home.py --server.port=10000
     envVars:
-      - key: PORT
-        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.10.12
+
