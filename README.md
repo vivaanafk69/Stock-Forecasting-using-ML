@@ -15,7 +15,7 @@ A full-featured, production-ready **stock price prediction platform** with:
 - Real-time price chart
 - Technical indicators visualization
 - Machine learning-based stock forecasting
-- Live News with Sentiment Score
+- Live News with Sentiment Score (Work in Progress)
 - Expandable dashboard with Streamlit
 
 ---
