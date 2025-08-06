@@ -150,11 +150,27 @@ with st.sidebar:
 # Caching with model persistence
 @st.cache_data(ttl=300)
 def fetch_stock_data(symbol, period, interval):
-    """Fetch and clean stock data with caching"""
+    """Fetch and clean stock data with enhanced error handling"""
     try:
+        # First attempt with original symbol
         data = yf.download(symbol, period=period, interval=interval, progress=False)
+        
+        # If data is empty and it's an Indian stock, try alternative suffixes
+        if data.empty and not any(suffix in symbol for suffix in ['.NS', '.BO']):
+            # Try NSE first
+            alt_symbol = symbol + '.NS'
+            data = yf.download(alt_symbol, period=period, interval=interval, progress=False)
+            if not data.empty:
+                symbol = alt_symbol
+            else:
+                # Try BSE
+                alt_symbol = symbol + '.BO'
+                data = yf.download(alt_symbol, period=period, interval=interval, progress=False)
+                if not data.empty:
+                    symbol = alt_symbol
+        
         if data.empty:
-            return pd.DataFrame(), "No data available"
+            return pd.DataFrame(), f"No data available for {symbol}"
         
         # Handle MultiIndex columns
         if isinstance(data.columns, pd.MultiIndex):
@@ -171,10 +187,53 @@ def fetch_stock_data(symbol, period, interval):
         if not all(col in data.columns for col in required):
             return pd.DataFrame(), "Missing required OHLCV data"
         
+        # Remove any rows with NaN values in essential columns
+        data = data.dropna(subset=['Open', 'High', 'Low', 'Close'])
+        
+        if len(data) < 10:
+            return pd.DataFrame(), f"Insufficient data points ({len(data)})"
+        
         return data, "Success"
         
     except Exception as e:
-        return pd.DataFrame(), f"Error fetching data: {str(e)}"
+        error_msg = str(e)
+        
+        # If it's a JSON decode error for Indian stocks, try alternative formats
+        if "JSONDecodeError" in error_msg or "Expecting value" in error_msg:
+            if not any(suffix in symbol for suffix in ['.NS', '.BO']):
+                # Try NSE format
+                try:
+                    alt_symbol = symbol + '.NS'
+                    data = yf.download(alt_symbol, period=period, interval=interval, progress=False)
+                    if not data.empty:
+                        # Process the data
+                        if isinstance(data.columns, pd.MultiIndex):
+                            data.columns = data.columns.get_level_values(0)
+                        data = data.reset_index()
+                        date_col = 'Datetime' if 'Datetime' in data.columns else 'Date'
+                        data['Time'] = pd.to_datetime(data[date_col])
+                        data = data.dropna(subset=['Open', 'High', 'Low', 'Close'])
+                        return data, f"Success (using {alt_symbol})"
+                except:
+                    pass
+                
+                # Try BSE format
+                try:
+                    alt_symbol = symbol + '.BO'
+                    data = yf.download(alt_symbol, period=period, interval=interval, progress=False)
+                    if not data.empty:
+                        # Process the data
+                        if isinstance(data.columns, pd.MultiIndex):
+                            data.columns = data.columns.get_level_values(0)
+                        data = data.reset_index()
+                        date_col = 'Datetime' if 'Datetime' in data.columns else 'Date'
+                        data['Time'] = pd.to_datetime(data[date_col])
+                        data = data.dropna(subset=['Open', 'High', 'Low', 'Close'])
+                        return data, f"Success (using {alt_symbol})"
+                except:
+                    pass
+        
+        return pd.DataFrame(), f"Error fetching data: {error_msg}"
 
 @st.cache_data
 def calculate_technical_indicators(df):
@@ -485,7 +544,14 @@ if ticker:
     
     if df.empty:
         st.error(f"❌ {status}")
+        # Provide helpful suggestions based on the ticker
+        if not any(suffix in ticker for suffix in ['.NS', '.BO']):
+            st.info(f"💡 Tip: For Indian stocks, try '{ticker}.NS' (NSE) or '{ticker}.BO' (BSE)")
         st.stop()
+    
+    # Show success message if ticker was auto-corrected
+    if "using" in status.lower():
+        st.info(f"✅ {status}")
     
     # Calculate indicators
     with st.spinner("🔧 Calculating technical indicators..."):
@@ -870,4 +936,4 @@ if ticker:
         if st.button("📊 Export Data"):
             csv = df.to_csv(index=False)
             st.download_button("Download CSV", csv, f"{ticker}_data.csv", "text/csv")
-
+            
