@@ -1,34 +1,39 @@
-# Use the official Python base image
+# Use official Python image
 FROM python:3.10-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set work directory
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for Prophet and other libs
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
+    libpython3-dev \
     libatlas-base-dev \
-    libmagic1 \
+    libgomp1 \
+    gcc \
+    g++ \
+    curl \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    wget \
+    libglib2.0-0 \
+    libgl1-mesa-glx \
+    libgeos-dev \
+    libproj-dev \
+    libgdal-dev \
+    && apt-get clean
 
-# Copy requirements and install dependencies
+# Copy requirements
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all source code into the container
+# Install Python dependencies
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application
 COPY . .
 
 # Expose the Streamlit default port
 EXPOSE 8501
 
-# Run Streamlit app
+# Run the Streamlit app
 CMD ["streamlit", "run", "Home.py", "--server.port=8501", "--server.address=0.0.0.0"]
-
