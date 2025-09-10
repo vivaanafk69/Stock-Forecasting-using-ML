@@ -14,8 +14,6 @@ st.title("🗞️ Live News Dashboard")
 # -------------------------------
 # Sidebar filters
 # -------------------------------
-topics = ["Stock Market", "Technology", "Reliance", "Infosys", "Banking", "Cryptocurrency", "Energy", "Gold", "Inflation"]
-selected_topic = st.sidebar.selectbox("Choose News Topic", topics)
 refresh_rate = st.sidebar.slider("⏱️ Auto Refresh Interval (sec)", 30, 300, 60)
 
 # -------------------------------
@@ -84,3 +82,4 @@ if "news_data" in st.session_state and st.session_state.news_data:
     show_news(st.session_state.news_data)
 else:
     st.warning("⚠️ No news articles found. Try another topic or check your connection.")
+
